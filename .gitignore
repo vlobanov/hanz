@@ -11,9 +11,6 @@ ENV/
 # Environment
 .env
 
-# Database
-*.db
-
 # IDE
 .idea/
 .vscode/
