@@ -23,8 +23,8 @@ from study_plan import get_day, get_day_title, get_all_days_summary
 async def get_study_day_content(day_number: int) -> str:
     """Get the full content for a specific study day.
 
-    Use this to retrieve grammar explanations, key phrases, exercises,
-    and speaking prompts for a given day in the 20-day B1 exam prep plan.
+    Use this to retrieve grammar explanations, vocabulary, key phrases, exercises,
+    writing tasks, speaking prompts, and voice exercises for a given day.
 
     Args:
         day_number: The day number (1-20)
@@ -36,15 +36,35 @@ async def get_study_day_content(day_number: int) -> str:
     content = f"DAY {day_number}: {day['title']} (Week {day['week']})\n\n"
     content += "=== GRAMMAR ===\n"
     content += day["grammar"].strip() + "\n\n"
-    content += "=== KEY PHRASES ===\n"
+
+    content += "=== VOCABULARY ===\n"
+    for topic, words in day["vocabulary"].items():
+        content += f"\n{topic}:\n"
+        for word_group in words:
+            content += f"  {word_group}\n"
+
+    if day.get("vocabulary_refresh"):
+        content += f"\nREFRESH: {day['vocabulary_refresh']}\n"
+
+    content += "\n=== KEY PHRASES ===\n"
     for phrase in day["key_phrases"]:
         content += f"- {phrase}\n"
-    content += "\n=== EXERCISES ===\n"
+
+    content += "\n=== GRAMMAR EXERCISES ===\n"
     for i, ex in enumerate(day["exercises"], 1):
         content += f"{i}. {ex}\n"
+
+    content += "\n=== WRITING EXERCISES ===\n"
+    for i, ex in enumerate(day.get("writing_exercises", []), 1):
+        content += f"{i}. {ex}\n"
+
     content += "\n=== SPEAKING PROMPTS ===\n"
     for prompt in day["speaking_prompts"]:
         content += f"- {prompt}\n"
+
+    content += "\n=== VOICE EXERCISES (send as voice messages!) ===\n"
+    for ex in day.get("voice_exercises", []):
+        content += f"- {ex}\n"
 
     return content
 

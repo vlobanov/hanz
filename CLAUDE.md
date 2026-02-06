@@ -4,39 +4,45 @@ A Telegram bot that guides you through a structured 20-day B1 exam preparation p
 
 ## Features
 
-- **20-Day Study Plan** - Structured curriculum covering all B1 grammar and exam skills
+- **20-Day Study Plan** - Structured curriculum covering all B1 grammar, vocabulary, and exam skills
+- **Integrated Vocabulary** - Topic-based vocabulary (Reisen, Arbeit, Umwelt, Technologie, Gesundheit, Wohnen) built into each day
 - **Progress Tracking** - Track completed days, current day, and overall progress
 - **Review System** - Bot notes topics you struggle with and helps you review them later
 - **Speaking Practice** - Send voice messages for speaking exercises, get feedback
+- **Proactive Voice Messages** - Bot sends voice messages as exercises (dictation, listening comprehension, drills)
+- **Writing Exercises** - Structured writing tasks with detailed feedback
 - **Voice Responses** - Receive lessons as voice messages (optional)
 - **Fun Roleplays** - Practice with immersive scenarios (apartment hunting, job interviews, etc.)
 
 ## The 20-Day Plan
 
-**Week 1: Foundation**
-- Days 1-2: Nebensätze (weil, dass, wenn, ob)
-- Days 3-4: Perfekt (regular + irregular verbs)
-- Day 5: Review + Dativ prepositions
+**Week 1: Foundation + Reisen + Arbeit**
+- Day 1: weil/dass + Reisen (Transportation & Booking)
+- Day 2: wenn/ob + Reisen (At the Destination)
+- Day 3: Review Nebensätze + Reisen (Problems & Solutions)
+- Day 4: Perfekt (Regular) + Arbeit (Jobs & Workplace)
+- Day 5: Perfekt (Irregular + sein) + Arbeit (Applications & Career)
 
-**Week 2: Expressing Yourself**
-- Days 6-7: Konjunktiv II (würde, hätte, wäre, könnte)
-- Day 8: Expressing opinions
-- Day 9: Komparativ und Superlativ
-- Day 10: Relativsätze
+**Week 2: Opinions & Self-Expression + Umwelt + Technologie**
+- Day 6: Konjunktiv II (würde) + Arbeit (Work-Life) + Umwelt (Intro)
+- Day 7: Konjunktiv II (hätte/wäre/könnte) + Umwelt (Problems)
+- Day 8: Meinungsäußerung + Umwelt (Solutions & Debates)
+- Day 9: Komparativ/Superlativ + Technologie (Devices & Internet)
+- Day 10: Relativsätze (Basics) + Technologie (Social Media)
 
-**Week 3: Complex Structures**
-- Day 11: obwohl und trotzdem
-- Day 12: um...zu und damit
-- Day 13: Adjektivdeklination
-- Day 14: Präteritum
-- Day 15: Review + Indirekte Fragen
+**Week 3: Complex Structures + Gesundheit + Wohnen**
+- Day 11: Relativsätze (Advanced) + Technologie (Full) + Gesundheit (Intro)
+- Day 12: obwohl/trotzdem + Gesundheit (Doctor & Treatment)
+- Day 13: um...zu/damit + Gesundheit (Lifestyle & Prevention)
+- Day 14: Adjektivdeklination + Wohnen (Types & Rooms)
+- Day 15: Präteritum + Wohnen (Location & Neighborhood)
 
-**Week 4: Exam Skills**
-- Day 16: Schreiben Teil 1 (informal email)
-- Day 17: Schreiben Teil 2 (opinion text)
-- Day 18: Schreiben Teil 3 + Sprechen Teil 1
-- Day 19: Sprechen Teil 2 (presentation)
-- Day 20: Full exam simulation
+**Week 4: Exam Skills + Meinungsphrasen**
+- Day 16: Indirekte Fragen + Meinungsphrasen
+- Day 17: Schreiben Teil 1 (informal email)
+- Day 18: Schreiben Teil 2 + Teil 3
+- Day 19: Sprechen Teil 1 + Teil 2
+- Day 20: Full review + exam simulation
 
 ## Setup
 
@@ -80,12 +86,15 @@ uv run python bot.py
 
 ## How It Works
 
-1. **Start a day** with `/day` - Hanz explains the grammar, then guides you through exercises
-2. **Do exercises** - Answer in text, Hanz corrects and explains mistakes
-3. **Speaking practice** - Send voice messages for speaking exercises
-4. **Struggling?** - Hanz automatically notes weak topics for later review
-5. **Finish** with `/done` - Marks day complete, moves to next day
-6. **Review** with `/review` - Practice topics you found difficult
+1. **Start a day** with `/day` - Hanz explains the grammar, introduces vocabulary, then guides you through exercises
+2. **Vocabulary refresh** - Quick review of previous days' vocabulary before new material
+3. **Grammar exercises** - Fill-in-the-blank, transformations, sentence building
+4. **Writing exercises** - Structured writing tasks (emails, stories, opinions) with detailed feedback
+5. **Speaking practice** - Send voice messages for speaking exercises
+6. **Voice exercises** - Hanz proactively sends voice messages for dictation, listening comprehension, and drills
+7. **Struggling?** - Hanz automatically notes weak topics for later review
+8. **Finish** with `/done` - Marks day complete, moves to next day
+9. **Review** with `/review` - Practice topics you found difficult
 
 ## Project Structure
 
