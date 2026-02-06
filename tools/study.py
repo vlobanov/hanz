@@ -38,10 +38,12 @@ async def get_study_day_content(day_number: int) -> str:
     content += day["grammar"].strip() + "\n\n"
 
     content += "=== VOCABULARY ===\n"
+    total_groups = 0
     for topic, words in day["vocabulary"].items():
         content += f"\n{topic}:\n"
-        for word_group in words:
-            content += f"  {word_group}\n"
+        for i, word_group in enumerate(words, total_groups + 1):
+            content += f"  Group {i}: {word_group}\n"
+        total_groups += len(words)
 
     if day.get("vocabulary_refresh"):
         content += f"\nREFRESH: {day['vocabulary_refresh']}\n"
@@ -65,6 +67,36 @@ async def get_study_day_content(day_number: int) -> str:
     content += "\n=== VOICE EXERCISES (send as voice messages!) ===\n"
     for ex in day.get("voice_exercises", []):
         content += f"- {ex}\n"
+
+    # Generate lesson checklist
+    content += "\n=== LESSON CHECKLIST ===\n"
+    step = 1
+    content += f"[ ] Step {step}: Grammar explanation\n"
+    step += 1
+    if day.get("vocabulary_refresh"):
+        content += f"[ ] Step {step}: Vocabulary refresh ({day['vocabulary_refresh']})\n"
+        step += 1
+    for topic, words in day["vocabulary"].items():
+        for i, word_group in enumerate(words):
+            content += f"[ ] Step {step}: Vocab group — {word_group} (present words, student forms 2 sentences)\n"
+            step += 1
+        content += f"[ ] Step {step}: Vocab mix-and-match round for {topic} (combine words from multiple groups)\n"
+        step += 1
+    content += f"[ ] Step {step}: Key phrases practice\n"
+    step += 1
+    for i, ex in enumerate(day["exercises"], 1):
+        content += f"[ ] Step {step}: Grammar exercise {i}\n"
+        step += 1
+    for ex in day.get("voice_exercises", []):
+        content += f"[ ] Step {step}: Voice exercise — {ex}\n"
+        step += 1
+    for i, ex in enumerate(day.get("writing_exercises", []), 1):
+        content += f"[ ] Step {step}: Writing exercise {i}\n"
+        step += 1
+    for prompt in day["speaking_prompts"]:
+        content += f"[ ] Step {step}: Speaking — {prompt}\n"
+        step += 1
+    content += f"\nTOTAL: {step - 1} steps. Work through them ONE AT A TIME.\n"
 
     return content
 

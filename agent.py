@@ -6,6 +6,7 @@ from langgraph.prebuilt import create_react_agent
 from config import GOOGLE_API_KEY, LLM_MODEL
 from prompts import SYSTEM_PROMPT
 from tools.study import get_study_tools
+from tools.voice import get_voice_tools
 
 
 class ConversationAgent:
@@ -30,8 +31,8 @@ class ConversationAgent:
 
     @property
     def tools(self):
-        """Get study tools."""
-        return get_study_tools()
+        """Get all agent tools."""
+        return get_study_tools() + get_voice_tools()
 
     @property
     def agent(self):

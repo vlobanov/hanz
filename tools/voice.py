@@ -1,5 +1,9 @@
+import contextvars
+import io
+
 from google import genai
 from elevenlabs import ElevenLabs
+from langchain_core.tools import tool
 
 from config import (
     ELEVENLABS_API_KEY,
@@ -7,6 +11,16 @@ from config import (
     ELEVENLABS_MODEL_ID,
     GOOGLE_API_KEY,
 )
+
+# Context vars for passing Telegram bot/chat into agent tools
+_telegram_bot: contextvars.ContextVar = contextvars.ContextVar("telegram_bot")
+_telegram_chat_id: contextvars.ContextVar = contextvars.ContextVar("telegram_chat_id")
+
+
+def set_telegram_context(bot, chat_id: int) -> None:
+    """Set Telegram context for voice tools. Call before agent.chat()."""
+    _telegram_bot.set(bot)
+    _telegram_chat_id.set(chat_id)
 
 
 def _get_elevenlabs_client() -> ElevenLabs:
@@ -70,3 +84,36 @@ async def text_to_speech(text: str) -> bytes:
     audio_data = b"".join(audio_generator)
 
     return audio_data
+
+
+@tool
+async def send_voice_message(text: str) -> str:
+    """Send a voice message to the student using text-to-speech.
+
+    Use this to proactively send voice exercises: dictation, listening comprehension,
+    grammar drills, or any content the student should hear spoken aloud.
+    The text will be converted to natural German speech and sent as a Telegram voice message.
+
+    Args:
+        text: The text to speak (German or English)
+    """
+    try:
+        bot = _telegram_bot.get()
+        chat_id = _telegram_chat_id.get()
+    except LookupError:
+        return "Error: Telegram context not available. Cannot send voice message."
+
+    audio_data = await text_to_speech(text)
+    caption = f"<tg-spoiler>{text[:1024]}</tg-spoiler>"
+    await bot.send_voice(
+        chat_id=chat_id,
+        voice=io.BytesIO(audio_data),
+        caption=caption,
+        parse_mode="HTML",
+    )
+    return "Voice message sent successfully."
+
+
+def get_voice_tools():
+    """Return all voice-related tools for the agent."""
+    return [send_voice_message]

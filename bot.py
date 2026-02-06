@@ -26,13 +26,19 @@ from database import (
 )
 from prompts import ROLEPLAY_START_PROMPT, START_DAY_PROMPT, REVIEW_PROMPT
 from study_plan import get_day_title, get_all_days_summary
-from tools.voice import text_to_speech, transcribe_audio
+from tools.voice import text_to_speech, transcribe_audio, set_telegram_context
 
 # Set up logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+
+
+async def agent_chat(update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int, message: str) -> str:
+    """Chat with agent, setting Telegram context so voice tools can send messages."""
+    set_telegram_context(context.bot, update.effective_chat.id)
+    return await agent.chat(user_id, message)
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -129,7 +135,7 @@ async def day_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
     # Start the day with the agent
     prompt = START_DAY_PROMPT.format(day_number=day_number, user_id=user_id)
-    response = await agent.chat(user_id, prompt)
+    response = await agent_chat(update, context, user_id, prompt)
 
     await send_response(update, user_id, response)
 
@@ -170,7 +176,7 @@ async def review_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     agent.clear_history(user_id)
 
     prompt = REVIEW_PROMPT.format(user_id=user_id)
-    response = await agent.chat(user_id, prompt)
+    response = await agent_chat(update, context, user_id, prompt)
 
     await send_response(update, user_id, response)
 
@@ -182,8 +188,8 @@ async def done_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     current_day = state["current_day"]
 
     # Ask agent to mark day complete
-    response = await agent.chat(
-        user_id,
+    response = await agent_chat(
+        update, context, user_id,
         f"Der Schüler sagt, er ist fertig mit Tag {current_day}. "
         f"Markiere den Tag als abgeschlossen mit mark_day_completed (user_id: {user_id}, day_number: {current_day}). "
         f"Gratuliere und schlage vor, morgen mit Tag {current_day + 1} weiterzumachen."
@@ -203,7 +209,7 @@ async def roleplay(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update_user_state(user_id, current_mode="roleplay")
     agent.clear_history(user_id)
 
-    response = await agent.chat(user_id, ROLEPLAY_START_PROMPT)
+    response = await agent_chat(update, context, user_id, ROLEPLAY_START_PROMPT)
 
     await send_response(update, user_id, response)
 
@@ -252,7 +258,7 @@ async def words_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 Mach es interaktiv - ein Wort nach dem anderen!
 """
-    response = await agent.chat(user_id, prompt)
+    response = await agent_chat(update, context, user_id, prompt)
     await send_response(update, user_id, response)
 
 
@@ -319,7 +325,7 @@ FORMAT:
 Mach es SCHNELL - keine langen Erklärungen! Nur Frage -> Antwort -> Feedback -> Nächste.
 Wenn der Schüler "stop" oder "fertig" sagt, beende das Drill.
 """
-    response = await agent.chat(user_id, prompt)
+    response = await agent_chat(update, context, user_id, prompt)
     await send_response(update, user_id, response)
 
 
@@ -379,7 +385,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     user_id = update.effective_user.id
     message_text = update.message.text
 
-    response = await agent.chat(user_id, message_text)
+    response = await agent_chat(update, context, user_id, message_text)
 
     await send_response(update, user_id, response)
 
@@ -399,7 +405,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         transcription = await transcribe_audio(temp_path)
         await update.message.reply_text(f"🎤 Ich habe gehört: \"{transcription}\"")
 
-        response = await agent.chat(user_id, transcription)
+        response = await agent_chat(update, context, user_id, transcription)
         await send_response(update, user_id, response)
 
     except Exception as e:
