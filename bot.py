@@ -75,7 +75,7 @@ OTHER:
 
 Say "stop" or "fertig" to end drills.
 """
-    await update.message.reply_text(help_text)
+    await update.message.reply_text(help_text, parse_mode="HTML")
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -106,7 +106,7 @@ Commands:
 
 Los geht's! Schreib /day um mit Tag {state['current_day']} zu beginnen.
 """
-    await update.message.reply_text(welcome_message)
+    await update.message.reply_text(welcome_message, parse_mode="HTML")
 
 
 async def day_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -119,10 +119,10 @@ async def day_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         try:
             day_number = int(context.args[0])
             if day_number < 1 or day_number > 20:
-                await update.message.reply_text("Bitte wähle einen Tag zwischen 1 und 20.")
+                await update.message.reply_text("Bitte wähle einen Tag zwischen 1 und 20.", parse_mode="HTML")
                 return
         except ValueError:
-            await update.message.reply_text("Bitte gib eine Zahl ein, z.B. /day 5")
+            await update.message.reply_text("Bitte gib eine Zahl ein, z.B. /day 5", parse_mode="HTML")
             return
     else:
         day_number = state["current_day"]
@@ -165,7 +165,7 @@ async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     completed = sum(1 for p in progress if p["status"] == "completed")
     result += f"\nAbgeschlossen: {completed}/20 Tage"
 
-    await update.message.reply_text(result)
+    await update.message.reply_text(result, parse_mode="HTML")
 
 
 async def review_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -224,7 +224,8 @@ async def memo_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             f"Dein Vokabular: {stats['total']} Wörter\n"
             f"Gut gelernt: {stats['learned']}\n"
             f"Zur Wiederholung: {stats['due_for_review']}\n\n"
-            "Benutze: /memo wort1 wort2 wort3 ..."
+            "Benutze: /memo wort1 wort2 wort3 ...",
+            parse_mode="HTML",
         )
         return
 
@@ -232,11 +233,11 @@ async def memo_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     added = await add_vocabulary_words(user_id, words)
 
     if added == 0:
-        await update.message.reply_text("Diese Wörter sind schon in deiner Liste.")
+        await update.message.reply_text("Diese Wörter sind schon in deiner Liste.", parse_mode="HTML")
     elif added == 1:
-        await update.message.reply_text(f"'{words[0]}' hinzugefügt!")
+        await update.message.reply_text(f"'{words[0]}' hinzugefügt!", parse_mode="HTML")
     else:
-        await update.message.reply_text(f"{added} Wörter hinzugefügt!")
+        await update.message.reply_text(f"{added} Wörter hinzugefügt!", parse_mode="HTML")
 
 
 async def words_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -273,7 +274,8 @@ async def grammar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             f"Gemeistert: {stats['learned']}\n"
             f"Zum Üben: {stats['due_for_review']}\n\n"
             "Benutze: /grammar thema1 thema2 ...\n"
-            "Beispiele: /grammar perfekt akkusativ konjunktiv"
+            "Beispiele: /grammar perfekt akkusativ konjunktiv",
+            parse_mode="HTML",
         )
         return
 
@@ -284,11 +286,11 @@ async def grammar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     added = await add_grammar_topics(user_id, topics)
 
     if added == 0:
-        await update.message.reply_text("Diese Themen sind schon in deiner Liste.")
+        await update.message.reply_text("Diese Themen sind schon in deiner Liste.", parse_mode="HTML")
     elif added == 1:
-        await update.message.reply_text(f"'{topics[0]}' hinzugefügt!")
+        await update.message.reply_text(f"'{topics[0]}' hinzugefügt!", parse_mode="HTML")
     else:
-        await update.message.reply_text(f"{added} Themen hinzugefügt!")
+        await update.message.reply_text(f"{added} Themen hinzugefügt!", parse_mode="HTML")
 
 
 async def drill_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -340,19 +342,20 @@ async def voice_setting(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         status = "an" if state.get("voice_enabled") else "aus"
         await update.message.reply_text(
             f"Sprachnachrichten sind aktuell {status}.\n"
-            "Benutze /voice on oder /voice off zum Ändern."
+            "Benutze /voice on oder /voice off zum Ändern.",
+            parse_mode="HTML",
         )
         return
 
     setting = args[0].lower()
     if setting == "on":
         await update_user_state(user_id, voice_enabled=1)
-        await update.message.reply_text("Sprachnachrichten aktiviert! 🔊")
+        await update.message.reply_text("Sprachnachrichten aktiviert! 🔊", parse_mode="HTML")
     elif setting == "off":
         await update_user_state(user_id, voice_enabled=0)
-        await update.message.reply_text("Sprachnachrichten deaktiviert. 🔇")
+        await update.message.reply_text("Sprachnachrichten deaktiviert. 🔇", parse_mode="HTML")
     else:
-        await update.message.reply_text("Benutze: /voice on oder /voice off")
+        await update.message.reply_text("Benutze: /voice on oder /voice off", parse_mode="HTML")
 
 
 async def send_response(update: Update, user_id: int, text: str) -> None:
@@ -362,7 +365,7 @@ async def send_response(update: Update, user_id: int, text: str) -> None:
     if state.get("voice_enabled"):
         await send_voice_response(update, text)
     else:
-        await update.message.reply_text(text)
+        await update.message.reply_text(text, parse_mode="HTML")
 
 
 async def send_voice_response(update: Update, text: str) -> None:
@@ -377,7 +380,7 @@ async def send_voice_response(update: Update, text: str) -> None:
         )
     except Exception as e:
         logger.error(f"Error generating voice: {e}")
-        await update.message.reply_text(text)
+        await update.message.reply_text(text, parse_mode="HTML")
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -403,7 +406,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     try:
         transcription = await transcribe_audio(temp_path)
-        await update.message.reply_text(f"🎤 Ich habe gehört: \"{transcription}\"")
+        await update.message.reply_text(f"🎤 Ich habe gehört: \"{transcription}\"", parse_mode="HTML")
 
         response = await agent_chat(update, context, user_id, transcription)
         await send_response(update, user_id, response)
@@ -412,7 +415,8 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         logger.error(f"Error processing voice message: {e}")
         await update.message.reply_text(
             "Entschuldigung, ich konnte die Sprachnachricht nicht verstehen. "
-            "Kannst du es nochmal versuchen oder als Text schreiben?"
+            "Kannst du es nochmal versuchen oder als Text schreiben?",
+            parse_mode="HTML",
         )
     finally:
         Path(temp_path).unlink(missing_ok=True)
