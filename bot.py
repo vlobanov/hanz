@@ -3,6 +3,8 @@ import logging
 import tempfile
 from pathlib import Path
 
+import nh3
+
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -27,6 +29,30 @@ from database import (
 from prompts import ROLEPLAY_START_PROMPT, START_DAY_PROMPT, REVIEW_PROMPT
 from study_plan import get_day_title, get_all_days_summary
 from tools.voice import text_to_speech, transcribe_audio, set_telegram_context
+
+TELEGRAM_ALLOWED_TAGS = {
+    "b", "strong", "i", "em", "u", "ins", "s", "strike", "del",
+    "span", "tg-spoiler", "a", "tg-emoji", "code", "pre", "blockquote",
+}
+
+TELEGRAM_ALLOWED_ATTRIBUTES = {
+    "a": {"href"},
+    "span": {"class"},
+    "tg-emoji": {"emoji-id"},
+    "code": {"class"},
+    "blockquote": {"expandable"},
+}
+
+
+def sanitize_html(text: str) -> str:
+    """Strip HTML tags not supported by Telegram."""
+    return nh3.clean(
+        text,
+        tags=TELEGRAM_ALLOWED_TAGS,
+        attributes=TELEGRAM_ALLOWED_ATTRIBUTES,
+        link_rel=None,
+    )
+
 
 # Set up logging
 logging.basicConfig(
@@ -361,6 +387,7 @@ async def voice_setting(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 async def send_response(update: Update, user_id: int, text: str) -> None:
     """Send response as text or voice based on user preference."""
     state = await get_user_state(user_id)
+    text = sanitize_html(text)
 
     if state.get("voice_enabled"):
         await send_voice_response(update, text)
@@ -406,7 +433,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     try:
         transcription = await transcribe_audio(temp_path)
-        await update.message.reply_text(f"🎤 Ich habe gehört: \"{transcription}\"", parse_mode="HTML")
+        await update.message.reply_text(f"🎤 Ich habe gehört: \"{sanitize_html(transcription)}\"", parse_mode="HTML")
 
         response = await agent_chat(update, context, user_id, transcription)
         await send_response(update, user_id, response)
